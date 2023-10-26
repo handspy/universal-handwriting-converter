@@ -52,15 +52,11 @@ public class LsPDFReader implements MultiPageReader {
         COSObject inkMLObject = (COSObject) lsObject
                 .getItem(COSName.getPDFName(LIVESCRIBE_INKML_KEY));
         if (inkMLObject != null) {
-            logger.info("This is a LiveScribe PDF.");
-
             COSStream inkMlCosStream = (COSStream) inkMLObject.getObject();
             ByteArrayInputStream bais = decompress(inkMlCosStream.createRawInputStream());
             pd.close();
             return bais;
         }
-
-        logger.info("This is NOT a LiveScribe PDF.");
 
         return null;
     }

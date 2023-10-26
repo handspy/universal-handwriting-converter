@@ -10,9 +10,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +22,7 @@ public class LsInkMLReader implements MultiPageReader {
 
     @Override
     public List<Page> read(File file) throws Exception {
-        return read(new FileInputStream(file));
+        return read(Files.newInputStream(file.toPath()));
     }
 
     @Override
@@ -49,7 +49,7 @@ public class LsInkMLReader implements MultiPageReader {
 
         boolean uniform = Boolean.parseBoolean(((Element) inkSourceSampleRateNode).getAttribute("uniform"));
         int value = Integer.parseInt(((Element) inkSourceSampleRateNode).getAttribute("value"));
-        double rate = Math.round(1000D / (double) value);
+        double rate = 1000D / (double) value;
 
         Node inkSourceTraceFormatNode = ((Element) inkSourceNode).getElementsByTagName("traceFormat").item(0);
         NodeList inkSourceTraceFormatChannelNodes = ((Element) inkSourceTraceFormatNode)
@@ -145,7 +145,8 @@ public class LsInkMLReader implements MultiPageReader {
             Element traceGroupTrace = (Element) traceGroupTraceNodes.item(j);
 
             String contextRef = traceGroupTrace.getAttribute("contextRef");
-            long timeOffset =
+            long timeOffset = Long.parseLong(traceGroupTrace.getAttribute("timeOffset"));
+            timeOffset =
                     Long.parseLong(traceGroupTrace.getAttribute("timeOffset")) +
                     calculateBaseTime(timestamps, contextRef);
 
